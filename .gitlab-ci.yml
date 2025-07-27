@@ -8,12 +8,14 @@ variables:
   DOCKER_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
   DOCKER_LATEST: "$CI_REGISTRY_IMAGE:latest"
 
+# Use docker image by default and enable docker-in-docker service
 default:
   image: docker:latest
   services:
     - docker:dind
 
 before_script:
+  # Login to GitLab Container Registry
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
 build:
@@ -21,6 +23,9 @@ build:
   image: maven:3.9-eclipse-temurin-21
   script:
     - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
 
 test:
   stage: test
